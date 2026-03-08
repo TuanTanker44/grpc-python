@@ -13,18 +13,22 @@ service StudentService {
   rpc UpdateStudent (StudentRequest) returns (StudentResponse);
 
   rpc DeleteStudent (StudentId) returns (DeleteResponse);
+
+  rpc HealthCheck(Empty) returns (HealthResponse);
 }
 
 message Empty {}
 
 message StudentId {
   int32 id = 1;
+  bool replica = 2;
 }
 
 message StudentRequest {
   int32 id = 1;
   string name = 2;
   int32 age = 3;
+  bool replica = 4;
 }
 
 message StudentResponse {
@@ -40,4 +44,9 @@ message StudentList {
 message DeleteResponse {
   bool success = 1;
   string message = 2;
+}
+
+message HealthResponse {
+  string status = 1;
+  int32 port = 2;
 }

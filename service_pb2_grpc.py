@@ -59,6 +59,11 @@ class StudentServiceStub(object):
                 request_serializer=service__pb2.StudentId.SerializeToString,
                 response_deserializer=service__pb2.DeleteResponse.FromString,
                 _registered_method=True)
+        self.HealthCheck = channel.unary_unary(
+                '/student.StudentService/HealthCheck',
+                request_serializer=service__pb2.Empty.SerializeToString,
+                response_deserializer=service__pb2.HealthResponse.FromString,
+                _registered_method=True)
 
 
 class StudentServiceServicer(object):
@@ -94,6 +99,12 @@ class StudentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def HealthCheck(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_StudentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -121,6 +132,11 @@ def add_StudentServiceServicer_to_server(servicer, server):
                     servicer.DeleteStudent,
                     request_deserializer=service__pb2.StudentId.FromString,
                     response_serializer=service__pb2.DeleteResponse.SerializeToString,
+            ),
+            'HealthCheck': grpc.unary_unary_rpc_method_handler(
+                    servicer.HealthCheck,
+                    request_deserializer=service__pb2.Empty.FromString,
+                    response_serializer=service__pb2.HealthResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -258,6 +274,33 @@ class StudentService(object):
             '/student.StudentService/DeleteStudent',
             service__pb2.StudentId.SerializeToString,
             service__pb2.DeleteResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def HealthCheck(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/student.StudentService/HealthCheck',
+            service__pb2.Empty.SerializeToString,
+            service__pb2.HealthResponse.FromString,
             options,
             channel_credentials,
             insecure,

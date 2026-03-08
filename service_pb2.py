@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x07student\"\x07\n\x05\x45mpty\"\x17\n\tStudentId\x12\n\n\x02id\x18\x01 \x01(\x05\"7\n\x0eStudentRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0b\n\x03\x61ge\x18\x03 \x01(\x05\"8\n\x0fStudentResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0b\n\x03\x61ge\x18\x03 \x01(\x05\"9\n\x0bStudentList\x12*\n\x08students\x18\x01 \x03(\x0b\x32\x18.student.StudentResponse\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2\xc5\x02\n\x0eStudentService\x12?\n\nAddStudent\x12\x17.student.StudentRequest\x1a\x18.student.StudentResponse\x12:\n\nGetStudent\x12\x12.student.StudentId\x1a\x18.student.StudentResponse\x12\x34\n\x0cListStudents\x12\x0e.student.Empty\x1a\x14.student.StudentList\x12\x42\n\rUpdateStudent\x12\x17.student.StudentRequest\x1a\x18.student.StudentResponse\x12<\n\rDeleteStudent\x12\x12.student.StudentId\x1a\x17.student.DeleteResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rservice.proto\x12\x07student\"\x07\n\x05\x45mpty\"(\n\tStudentId\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0f\n\x07replica\x18\x02 \x01(\x08\"H\n\x0eStudentRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0b\n\x03\x61ge\x18\x03 \x01(\x05\x12\x0f\n\x07replica\x18\x04 \x01(\x08\"8\n\x0fStudentResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0b\n\x03\x61ge\x18\x03 \x01(\x05\"9\n\x0bStudentList\x12*\n\x08students\x18\x01 \x03(\x0b\x32\x18.student.StudentResponse\"2\n\x0e\x44\x65leteResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\".\n\x0eHealthResponse\x12\x0e\n\x06status\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x32\xfd\x02\n\x0eStudentService\x12?\n\nAddStudent\x12\x17.student.StudentRequest\x1a\x18.student.StudentResponse\x12:\n\nGetStudent\x12\x12.student.StudentId\x1a\x18.student.StudentResponse\x12\x34\n\x0cListStudents\x12\x0e.student.Empty\x1a\x14.student.StudentList\x12\x42\n\rUpdateStudent\x12\x17.student.StudentRequest\x1a\x18.student.StudentResponse\x12<\n\rDeleteStudent\x12\x12.student.StudentId\x1a\x17.student.DeleteResponse\x12\x36\n\x0bHealthCheck\x12\x0e.student.Empty\x1a\x17.student.HealthResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,15 +34,17 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_EMPTY']._serialized_start=26
   _globals['_EMPTY']._serialized_end=33
   _globals['_STUDENTID']._serialized_start=35
-  _globals['_STUDENTID']._serialized_end=58
-  _globals['_STUDENTREQUEST']._serialized_start=60
-  _globals['_STUDENTREQUEST']._serialized_end=115
-  _globals['_STUDENTRESPONSE']._serialized_start=117
-  _globals['_STUDENTRESPONSE']._serialized_end=173
-  _globals['_STUDENTLIST']._serialized_start=175
-  _globals['_STUDENTLIST']._serialized_end=232
-  _globals['_DELETERESPONSE']._serialized_start=234
-  _globals['_DELETERESPONSE']._serialized_end=284
-  _globals['_STUDENTSERVICE']._serialized_start=287
-  _globals['_STUDENTSERVICE']._serialized_end=612
+  _globals['_STUDENTID']._serialized_end=75
+  _globals['_STUDENTREQUEST']._serialized_start=77
+  _globals['_STUDENTREQUEST']._serialized_end=149
+  _globals['_STUDENTRESPONSE']._serialized_start=151
+  _globals['_STUDENTRESPONSE']._serialized_end=207
+  _globals['_STUDENTLIST']._serialized_start=209
+  _globals['_STUDENTLIST']._serialized_end=266
+  _globals['_DELETERESPONSE']._serialized_start=268
+  _globals['_DELETERESPONSE']._serialized_end=318
+  _globals['_HEALTHRESPONSE']._serialized_start=320
+  _globals['_HEALTHRESPONSE']._serialized_end=366
+  _globals['_STUDENTSERVICE']._serialized_start=369
+  _globals['_STUDENTSERVICE']._serialized_end=750
 # @@protoc_insertion_point(module_scope)

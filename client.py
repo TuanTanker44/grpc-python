@@ -22,7 +22,7 @@ def health_check(server):
         return True
 
     except:
-        print(f"{server} -> DOWN")
+        print(f"Except: {server} -> DOWN")
         return False
 
 def main():
@@ -156,7 +156,7 @@ def main():
                         print("all -> DOWN")
                         
                 else:
-                    health_check(parts[1])
+                    health_check(f"127.0.0.1:{parts[1]}")
 
                 
             else:

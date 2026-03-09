@@ -1,19 +1,46 @@
 import grpc
-import random
 import service_pb2
 import service_pb2_grpc
 
 
-def connect_server(port):
-    channel = grpc.insecure_channel(f"localhost:{port}")
+SERVERS = [
+    "127.0.0.1:50051",
+    "127.0.0.1:50052",
+    "127.0.0.1:50053"
+]
+
+
+def create_stub(server):
+    channel = grpc.insecure_channel(server)
     stub = service_pb2_grpc.StudentServiceStub(channel)
-    return channel, stub
+    return stub
+
+
+def call_with_failover(method, request, timeout=5):
+    last_error = None
+
+    for server in SERVERS:
+        try:
+            stub = create_stub(server)
+
+            rpc_method = getattr(stub, method)
+
+            response = rpc_method(request, timeout=timeout)
+
+            print(f"[SERVER] handled by {server}")
+
+            return response
+
+        except Exception as e:
+            print(f"[FAIL] {server} -> {e}")
+            last_error = e
+
+    raise last_error
+
 
 def health_check(server):
-
     try:
-        channel = grpc.insecure_channel(server)
-        stub = service_pb2_grpc.StudentServiceStub(channel)
+        stub = create_stub(server)
 
         res = stub.HealthCheck(service_pb2.Empty(), timeout=2)
 
@@ -22,25 +49,21 @@ def health_check(server):
         return True
 
     except:
-        print(f"Except: {server} -> DOWN")
+        print(f"{server} -> DOWN")
         return False
+
 
 def main():
 
-    channel = grpc.insecure_channel(
-        "ipv4:127.0.0.1:50051,127.0.0.1:50052,127.0.0.1:50053",
-        options=[("grpc.lb_policy_name", "round_robin")] # sử dụng load balancing round robin để phân phối request đều giữa các server
-    )
-
-    stub = service_pb2_grpc.StudentServiceStub(channel) # tạo stub để gọi các phương thức của service trên server
-
-    # connect
-    # INSERT id name age
-    # SELECT id
-    # SELECT ALL
-    # UPDATE id name age
-    # DELETE id
-    # exit
+    print("Student SQL Console")
+    print("Commands:")
+    print("INSERT id name age")
+    print("SELECT id")
+    print("SELECT ALL")
+    print("UPDATE id name age")
+    print("DELETE id")
+    print("HEALTH port|ALL")
+    print("exit")
 
     while True:
 
@@ -52,36 +75,33 @@ def main():
         parts = cmd.split()
 
         try:
-            if parts[0].upper() == "CONNECT":
 
-                port = parts[1]
-                channel, stub = connect_server(port)
-
-                print("Connected to server at port", port)
-            
-
-            elif parts[0].upper() == "INSERT":
+            if parts[0].upper() == "INSERT":
 
                 id = int(parts[1])
                 name = parts[2]
                 age = int(parts[3])
 
-                res = stub.AddStudent(
+                res = call_with_failover(
+                    "AddStudent",
                     service_pb2.StudentRequest(
                         id=id,
                         name=name,
                         age=age
-                    ),
-                    timeout=5
+                    )
                 )
 
                 print(f"Inserted: id={res.id}, name={res.name}, age={res.age}")
+
 
             elif parts[0].upper() == "SELECT":
 
                 if parts[1].upper() == "ALL":
 
-                    res = stub.ListStudents(service_pb2.Empty(),timeout=5)
+                    res = call_with_failover(
+                        "ListStudents",
+                        service_pb2.Empty()
+                    )
 
                     for s in res.students:
                         print(f"id={s.id}, name={s.name}, age={s.age}")
@@ -90,11 +110,13 @@ def main():
 
                     id = int(parts[1])
 
-                    res = stub.GetStudent(
-                        service_pb2.StudentId(id=id),timeout=5
+                    res = call_with_failover(
+                        "GetStudent",
+                        service_pb2.StudentId(id=id)
                     )
 
                     print(f"id={res.id}, name={res.name}, age={res.age}")
+
 
             elif parts[0].upper() == "UPDATE":
 
@@ -102,69 +124,68 @@ def main():
                 name = parts[2]
                 age = int(parts[3])
 
-                res = stub.UpdateStudent(
+                res = call_with_failover(
+                    "UpdateStudent",
                     service_pb2.StudentRequest(
                         id=id,
                         name=name,
                         age=age
-                    ),
-                    timeout=5
+                    )
                 )
 
                 print(f"Updated: id={res.id}, name={res.name}, age={res.age}")
+
 
             elif parts[0].upper() == "DELETE":
 
                 id = int(parts[1])
 
-                res = stub.DeleteStudent(
-                    service_pb2.StudentId(id=id),
-                    timeout=5
+                res = call_with_failover(
+                    "DeleteStudent",
+                    service_pb2.StudentId(id=id)
                 )
 
                 print(f"Deleted: {res.message}")
-                
-                
+
+
             elif parts[0].upper() == "HEALTH":
-                
+
                 if len(parts) < 2:
-                    print("Usage: health <port|all>")
+                    print("Usage: HEALTH <port|ALL>")
                     continue
-                
+
                 if parts[1].upper() == "ALL":
-                    servers = [
-                        "127.0.0.1:50051",
-                        "127.0.0.1:50052",
-                        "127.0.0.1:50053"
-                    ]
-                    
+
                     serving_counter = 0
 
-                    for server in servers:
+                    for server in SERVERS:
+
                         status = health_check(server)
 
-                        if status == True:
+                        if status:
                             serving_counter += 1
 
-                    
-                    if serving_counter == len(servers):
+                    if serving_counter == len(SERVERS):
                         print("all -> SERVING")
+
                     elif serving_counter > 0:
                         print("all -> DEGRADED")
-                        print(f"available: {serving_counter} / {len(servers)}")
+                        print(f"available: {serving_counter} / {len(SERVERS)}")
+
                     else:
                         print("all -> DOWN")
-                        
-                else:
-                    health_check(f"127.0.0.1:{parts[1]}")
 
-                
+                else:
+
+                    port = parts[1]
+                    health_check(f"127.0.0.1:{port}")
+
+
             else:
                 print("Unknown command")
 
         except Exception as e:
             print("Error:", e)
-            
 
 
 if __name__ == "__main__":
